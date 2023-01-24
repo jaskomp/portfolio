@@ -3,24 +3,23 @@ Nazywam się Tomasz Jastrzębski. Obecnie jestem odpowiedzialny za wdrożenia, j
 Moja rola w projekcie to m.in.:
 * testy nowych funkcjonalności oraz ich opracowywanie na podstawie potrzeb Klientów,
 * praca z wymaganiami (pozyskiwanie, walidacja, zarządzanie),
-* wdrożenia systemu u klientów oraz opieka powdrożeniowa (merytoryczna i techniczna),
-* projektowanie i implementacja scenariuszy testów automatycznych z wykorzystaniem Selenium, Python oraz GitLab CI/CD
+* wdrożenia systemu u Klientów oraz opieka powdrożeniowa (merytoryczna i techniczna),
+* projektowanie i implementacja scenariuszy testów automatycznych z wykorzystaniem Selenium, Python oraz GitLab CI/CD.
 
-Przez czas, który spędziłem w zespole udało mi się na podstawie kursów od jaktestować.pl, wdrożyć od zera proces automatyzacji testów regresji, dla aplikacji którą produkujemy. Testy pisane są w języku Python z wykorzystaniem Selenium i GitLab CI/CD. Przy okazji testów stworzyłem też API odpowiedzialne za przetwarzanie danych powstałych podczas testów w celu serwowania ich w postaci szczegółowych raportów. API stworzone zostało przy wykorzystaniu Node.js.
+Przez czas, który spędziłem w zespole, udało mi się na podstawie kursów od jaktestować.pl, wdrożyć od zera proces automatyzacji testów regresji dla aplikacji którą produkujemy. Testy pisane są w języku Python z wykorzystaniem Selenium i GitLab CI/CD. Przy okazji testów stworzyłem też API odpowiedzialne za przetwarzanie danych powstałych podczas testów w celu serwowania ich w postaci szczegółowych raportów. API stworzone zostało przy wykorzystaniu Node.js.
 
-Oprócz tego stworzyłem też narzędzia wspomagające dział wdrożeń w codziennej pracy. Zaliczam do nich dwie aplikacje zaprogramowane z wykorzystaniem Tkinter. Pierwsza z nich importuje do produkcyjnego systemu, dane na podstawie wskazanego arkusza .xlsx z wykorzystaniem zapytań MySQL. Eliminuje dzięki temu konieczność wprowadzania ich bezpośrednio z poziomu formularzy aplikacji ograniczając się do wskazania docelowego środowiska importu. Druga z kolei pozwala na szybką aktualizację środowisk testowych, poprzez wywoływanie zdefiniowanych poleceń powłoki bezpośrednio z jej poziomu, umozliwiając również wybór środowiska do zaktualizowania. Dzięki temu proces ogranicza się do wskazania środowiska i wersji do której chcemy je zaktualizować, unikając łączenia się do niego po SSH i wprowadzania komend z klawiatury.
+Oprócz tego stworzyłem też narzędzia wspomagające dział wdrożeń w codziennej pracy. Zaliczam do nich dwie aplikacje powstałe z wykorzystaniem Tkinter. Pierwsza z nich importuje do wskazanego produkcyjnego systemu, dane na podstawie wskazanego arkusza .xlsx z wykorzystaniem zapytań MySQL. Eliminuje dzięki temu konieczność wprowadzania ich bezpośrednio z poziomu formularzy aplikacji, ograniczając czas potrzebny na ta czynność. Druga z kolei pozwala na szybką aktualizację określonych środowisk testowych, poprzez wywoływanie zdefiniowanych poleceń powłoki bezpośrednio z jej poziomu (wskazujemy serwer z listy i wybieramy branch, który chcemy na niego wgrać). Dzięki temu proces ogranicza się do wskazania środowiska i wersji do której chcemy je zaktualizować, unikając łączenia się do niego po SSH i wprowadzania komend z klawiatury w powłoce.
 # Narzędzia z jakich korzystam
 * Jira
 * PyCharm
 * Gitlab
-* Todoist
 * VSC
+* Git
 # Umiejętności
-* Jira
 * Python
 * SQL
 * HTML/CSS/Bootstrap
-* PHP
+* PHP (rozumienie kodu)
 * DevTools
 * Agile
 # Certyfikaty
