@@ -23,7 +23,7 @@ Oprócz tego stworzyłem też narzędzia wspomagające dział wdrożeń w codzie
 * DevTools
 * Agile
 # Code snippets
-* VIP
+* [Python + Selenium](https://github.com/jaskomp/portfolio/tree/main/code_snippets/python/selenium_automation)
 # Certyfikaty
 * ISTQB CTFL No. 08715/FLCT/2017
 * IREB CPRE No. [RE-00073-FLIREB-2018](https://www.ireb.org/en/service/cpre-registry-list/4539/)
