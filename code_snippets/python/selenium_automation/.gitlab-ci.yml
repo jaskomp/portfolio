@@ -1,0 +1,294 @@
+# lista trybów wykonania testów $MODE:
+# 'full' - wszystko (magazyny, najem)
+# 'orders' - same zlecenia
+# 'lease' - zlecenia i moduł najmu
+# 'sale' - wszystko bez magazynów
+# 'noSaleNoLease' - wszystko bez magazynów i najmu
+# 'noDict' - wszystko bez testów słowników
+# 'noDictNoLease' - wszystko bez testów słowników i najmu
+# SUBDOMAIN to subdomena serwera na którym będzie wywołany test, jeśli test chcemy puścić na https://staging.yyy.pl to SUBDOMAIN ustawiamy na "staging"
+# RCP - info czy wykonujemy testy RCP, domyślnie "True", alternatywna wartość to "False", jeśli wybieramy True to musimy pamiętać o ustawieniu odpowiednich kodów poniżej
+# RCP_WORKER_CODE_X - tutaj podajemy kody pracowników hali, którzy mają być wykorzystani przy testach ścieżek RCP
+# USER i PASSWORD to dane do logowania, przy podmianie baz trzeba pamiętać o właściwych danych
+# API - True|False czy artefakty wysyłać do zewnętrznego API, z którego wracać będą JSONy ze szczegółami etapów i które prezentować będzie pełny HTML z podsumowaniem testów
+
+variables:
+  MODE: "full"
+  SUBDOMAIN: "staging"
+  RCP: "True"
+  RCP_WORKER_CODE_1: "CODE1"
+  RCP_WORKER_CODE_2: "CODE2"
+  USER: "selenium"
+  PASSWORD: "PASSWORD"
+  API: "False"
+
+stages:
+  - smoke
+  - functional_serviceorder_create
+  - functional_dictionaries
+  - functional_lease
+  - functional_serviceorder_operations
+  - functional_rcp
+  - functional_sale
+  - functional_purchase
+  - functional_warehouse
+  - functional_payments
+  - functional_settings
+  - functional_summary
+
+image: joyzoursky/python-chromedriver:3.9-selenium
+
+before_script:
+    - /usr/local/bin/chromedriver -v
+    - pip install -r requirements.txt
+    - 'echo -e "Tryb przeprowadzania testów: $MODE"'
+    - 'echo -e "Używam RCP: $RCP"'
+
+smoke_ui:
+  only:
+    - master
+  stage: smoke
+  script:
+    - >
+      if [ $MODE == "full" ] || [ $MODE == "noDict" ]; then
+        python -m unittest -v ServiceOrders.Smoke.security
+        python -m unittest -v ServiceOrders.Smoke.serviceorder_smoke
+        python -m unittest -v Sale.Smoke.sale_smoke
+        python -m unittest -v Lease.Smoke.lease_smoke
+        python -m unittest -v Purchase.Smoke.purchase_smoke
+        python -m unittest -v Warehouse.Smoke.warehouse_smoke
+      elif [ $MODE == "orders" ]; then
+        python -m unittest -v ServiceOrders.Smoke.security
+        python -m unittest -v ServiceOrders.Smoke.serviceorder_smoke
+      elif [ $MODE == "lease" ]; then
+        python -m unittest -v ServiceOrders.Smoke.security
+        python -m unittest -v ServiceOrders.Smoke.serviceorder_smoke
+        python -m unittest -v Lease.Smoke.lease_smoke
+      elif [ $MODE == "sale" ]; then
+        python -m unittest -v ServiceOrders.Smoke.security
+        python -m unittest -v ServiceOrders.Smoke.serviceorder_smoke
+        python -m unittest -v Sale.Smoke.sale_smoke
+        python -m unittest -v Lease.Smoke.lease_smoke
+      elif [ $MODE == "noSaleNoLease" ]; then
+        python -m unittest -v ServiceOrders.Smoke.security
+        python -m unittest -v ServiceOrders.Smoke.serviceorder_smoke
+      elif [ $MODE == "noDictNolease" ]; then
+        python -m unittest -v ServiceOrders.Smoke.security
+        python -m unittest -v ServiceOrders.Smoke.serviceorder_smoke
+        python -m unittest -v Sale.Smoke.sale_smoke
+        python -m unittest -v Purchase.Smoke.purchase_smoke
+        python -m unittest -v Warehouse.Smoke.warehouse_smoke
+      else
+        echo "Nie wybrano prawidłowego trybu wykonania testów."
+      fi
+  artifacts:
+    when: always
+    paths:
+      - ./TestResults/Lease/
+      - ./TestResults/Sale/
+      - ./TestResults/ServiceOrders/
+      - ./TestResults/Settings/
+      - ./TestResults/Purchase/
+      - ./TestResults/Warehouse/
+      - ./ValueStorage/
+
+functional_serviceorder_create_order:
+  only:
+    - master
+  stage: functional_serviceorder_create
+  when: on_success
+  needs:
+    - job: smoke_ui
+  script:
+    - python -m unittest -v ServiceOrders.Functional.serviceorder_create
+  artifacts:
+    when: always
+    paths:
+      - ./TestResults/ServiceOrders/
+      - ./ValueStorage/
+
+functional_dictionaries_crud:
+  only:
+    - master
+  stage: functional_dictionaries
+  when: on_success
+  needs:
+    - job: functional_serviceorder_create_order
+  script:
+    - >
+      if [ $MODE == "noDict" ] || [ $MODE == "noDictNoLease" ]; then 
+        echo "Pomijam testy słowników, gdyż wybrano tryb w którym mają nie być wykonywane."
+      else
+        python -m unittest -v Settings.Functional.dictionaries_crud
+        python -m unittest -v Settings.Functional.settings_from_modal_preview
+      fi
+  artifacts:
+    when: always
+    paths:
+      - ./TestResults/Settings/
+      - ./ValueStorage/
+
+functional_lease_operations:
+  stage: functional_lease
+  when: always
+  needs:
+    - job: functional_dictionaries_crud
+  script:
+    - >
+      if [ $MODE == "full" ] || [ $MODE == "lease" ] || [ $MODE == "sale" ] || [ $MODE == "noDict" ]; then 
+        python -m unittest -v Lease.Functional.lease_operations
+      else
+        echo "Pomijam testy najmu, gdyż wybrano tryb w którym mają nie być wykonywane."
+      fi
+  artifacts:
+    when: always
+    paths:
+      - ./TestResults/Lease/
+      - ./ValueStorage/
+
+functional_serviceorder_operations_order:
+  only:
+    - master
+  stage: functional_serviceorder_operations
+  when: always
+  needs:
+    - job: functional_lease_operations
+  script:
+    - python -m unittest -v ServiceOrders.Functional.serviceorder_operations
+    - python -m unittest -v ServiceOrders.Functional.mixes_tests
+  artifacts:
+    when: always
+    paths:
+      - ./TestResults/ServiceOrders/
+      - ./ValueStorage/
+
+functional_rcp_key_paths:
+  only:
+    - master
+  stage: functional_rcp
+  when: on_success
+  needs:
+    - job: functional_serviceorder_operations_order
+  script:
+    - >
+      if [ $RCP == "True" ]; then 
+        python -m unittest -v Rcp.Functional.rcp_key_paths
+      else
+        echo "Pomijam testy RCP, gdyż wybrano tryb w którym mają nie być wykonywane."
+      fi
+  artifacts:
+    when: always
+    paths:
+      - ./TestResults/Rcp/
+      - ./ValueStorage/
+
+functional_serviceorder_sale:
+  stage: functional_sale
+  when: on_success
+  needs:
+    - job: functional_rcp_key_paths
+  script:
+    - >
+      if [ $MODE == "full" ] || [ $MODE == "sale" ] || [ $MODE == "noSaleNoLease" ] || [ $MODE == "noDict" ] || [ $MODE == "noDictNoLease" ]; then
+        python -m unittest -v Sale.Sale.sale_operations
+      else
+        echo "Pomijam testy sprzedaży, gdyż wybrano tryb w którym mają nie być wykonywane."
+      fi
+  artifacts:
+    when: always
+    paths:
+      - ./TestResults/Sale/
+      - ./ValueStorage/
+
+functional_purchase_operations:
+  stage: functional_purchase
+  when: on_success
+  needs:
+    - job: functional_serviceorder_sale
+  script:
+    - >
+      if [ $MODE == "full" ] || [ $MODE == "sale" ] || [ $MODE == "noSaleNoLease" ] || [ $MODE == "noDict" ] || [ $MODE == "noDictNoLease" ]; then
+        python -m unittest -v Purchase.Functional.purchase_operations
+      else
+        echo "Pomijam testy zakupów, gdyż wybrano tryb w którym mają nie być wykonywane."
+      fi
+  artifacts:
+    when: always
+    paths:
+      - ./TestResults/Purchase/
+      - ./ValueStorage/
+
+functional_warehouse_operations:
+  stage: functional_warehouse
+  when: on_success
+  needs:
+    - job: functional_purchase_operations
+  script:
+    - >
+      if [ $MODE == "full" ] || [ $MODE == "noDict" ] || [ $MODE == "noDictNoLease" ]; then
+        python -m unittest -v Warehouse.Functional.warehouse_operations
+      else
+        echo "Pomijam testy magazynów, gdyż wybrano tryb w którym mają nie być wykonywane."
+      fi
+  artifacts:
+    when: always
+    paths:
+      - ./TestResults/Warehouse/
+      - ./ValueStorage/
+
+functional_payments_operations:
+  stage: functional_payments
+  when: on_success
+  needs:
+    - functional_warehouse_operations
+  script:
+    - >
+      if [ $MODE == "full" ] || [ $MODE == "sale" ] || [ $MODE == "noSaleNoLease" ] || [ $MODE == "noDict" ] || [ $MODE == "noDictNoLease" ]; then
+        python -m unittest -v Sale.Payments.payments_operations
+      else
+        echo "Pomijam testy płatności, gdyż wybrano tryb w którym mają nie być wykonywane."
+      fi
+  artifacts:
+    when: always
+    paths:
+      - ./TestResults/Sale/
+      - ./TestResults/Purchase/
+      - ./ValueStorage/
+
+.functional_settings_all_settings_preview:
+  only:
+    - master
+  stage: functional_settings
+  needs:
+    - job: functional_payments_operations
+  when: on_success
+  script:
+    - python -m unittest -v Settings.Functional.all_setting_from_modal_preview
+  artifacts:
+    when: always
+    paths:
+      - ./TestResults/ServiceOrders/
+      - ./ValueStorage/
+
+functional_send_summary:
+  only:
+    - master
+  stage: functional_summary
+  when: always
+  script:
+    - python -m unittest Core.test_summary
+  artifacts:
+    when: always
+    paths:
+      - ./ValueStorage/
+  dependencies:
+    - smoke_ui
+    - functional_serviceorder_create_order
+    - functional_dictionaries_crud
+    - functional_lease_operations
+    - functional_serviceorder_operations_order
+    - functional_rcp_key_paths
+    - functional_serviceorder_sale
+    - functional_purchase_operations
+    - functional_warehouse_operations
+    - functional_payments_operations
