@@ -6,9 +6,10 @@ Moja rola w projekcie to m.in.:
 * wdrożenia systemu u Klientów oraz opieka powdrożeniowa (merytoryczna i techniczna),
 * projektowanie i implementacja scenariuszy testów automatycznych z wykorzystaniem Selenium, Python oraz GitLab CI/CD.
 
-Przez czas, który spędziłem w zespole, udało mi się na podstawie kursów od jaktestować.pl, wdrożyć od zera proces automatyzacji testów regresji dla aplikacji którą produkujemy. Testy pisane są w języku Python z wykorzystaniem Selenium i GitLab CI/CD. Przy okazji testów stworzyłem też API odpowiedzialne za przetwarzanie danych powstałych podczas testów w celu serwowania ich w postaci szczegółowych raportów. API stworzone zostało przy wykorzystaniu Node.js.
+Przez czas, który spędziłem w zespole, udało mi się na podstawie kursów od jaktestować.pl, wdrożyć od zera proces automatyzacji testów regresji dla aplikacji którą produkujemy. Testy pisane są w języku Python z wykorzystaniem Selenium i GitLab CI/CD. Przy okazji testów stworzyłem też API odpowiedzialne za przetwarzanie danych powstałych podczas testów w celu serwowania ich w postaci szczegółowych raportów. API stworzone zostało przy wykorzystaniu Express.js.
 
-Oprócz tego stworzyłem też narzędzia wspomagające dział wdrożeń w codziennej pracy. Zaliczam do nich dwie aplikacje powstałe z wykorzystaniem Tkinter. Pierwsza z nich importuje do wskazanego produkcyjnego systemu, dane na podstawie wskazanego arkusza .xlsx z wykorzystaniem zapytań MySQL. Eliminuje dzięki temu konieczność wprowadzania ich bezpośrednio z poziomu formularzy aplikacji, ograniczając czas potrzebny na tę czynność. Druga pozwala na szybką aktualizację określonych środowisk testowych, poprzez wywoływanie bezpośrednio z jej poziomu zdefiniowanych poleceń powłoki (wskazujemy serwer z listy i wybieramy branch, który chcemy na niego wgrać). Dzięki temu proces ogranicza się do wskazania środowiska i wersji do której chcemy je zaktualizować, unikając łączenia się do niego po SSH i wprowadzania komend z klawiatury w powłoce.
+Oprócz tego stworzyłem z wykorzystaniem Tkinter narzędzia wspomagające dział wdrożeń w codziennej pracy. Są to aplikacje automatyzujące codzienne powtarzalne czynności takie jak: aktualizacje systemów testowych, importy danych wsadowych do nowo wdrażanych systemów, czy generowanie raportów ze zgłoszeń na liniach wsparcia.
+
 # Narzędzia z jakich korzystam
 * Jira
 * PyCharm
